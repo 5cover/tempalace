@@ -1,20 +1,14 @@
 {
-  "name": "tempalace",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "name": "tempalace-workspace",
+  "private": true,
+  "version": "0.1.0",
+  "packageManager": "pnpm@11.20.0",
+  "engines": {
+    "node": ">=22.0.0"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "devEngines": {
-    "packageManager": {
-      "name": "pnpm",
-      "version": "^11.20.0",
-      "onFail": "download"
-    }
-  },
-  "type": "module"
+    "build": "pnpm --recursive run build",
+    "test": "pnpm --recursive run test",
+    "typecheck": "pnpm --recursive run typecheck"
+  }
 }
