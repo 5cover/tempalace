@@ -7,9 +7,12 @@ import {
   type TemplateRegistry,
 } from "@tempalace/core"
 import { formatError } from "./errors.js"
+import { runInteractive } from "./interactive.js"
 import { parseTemplateArguments, readStructuredInput } from "./input.js"
+import { writeOutput } from "./output.js"
 import { findRegistryPath } from "./registry.js"
 import { serializeOutput } from "./serialization.js"
+import { runRegistryTests } from "./testing.js"
 
 interface DirectOptions {
   readonly registry?: string
@@ -19,6 +22,8 @@ interface DirectOptions {
   readonly inputYaml?: string
   readonly json?: boolean
   readonly yaml?: boolean
+  readonly clipboard?: boolean
+  readonly output?: string
 }
 
 function getOutputFormat(options: DirectOptions): "auto" | "json" | "yaml" {
@@ -70,7 +75,7 @@ async function executeTemplate(
   }
   const input = await getInput(options, fields)
   const result = await new InProcessTemplateExecutor().execute(currentTemplate, input)
-  process.stdout.write(serializeOutput(result, getOutputFormat(options)))
+  await writeOutput(serializeOutput(result, getOutputFormat(options)), options)
 }
 
 export async function runCli(argv: readonly string[]): Promise<void> {
@@ -86,13 +91,29 @@ export async function runCli(argv: readonly string[]): Promise<void> {
     .option("--input-yaml <yaml>", "whole input as YAML, or - for stdin")
     .option("--json", "serialize output as JSON")
     .option("--yaml", "serialize output as YAML")
+    .option("-c, --clipboard", "copy output to the system clipboard")
+    .option("-o, --output <path>", "write output to a file")
     .argument("[id]", "registry template ID")
     .action(async (id: string | undefined, options: DirectOptions) => {
       if (id === undefined) {
-        throw new Error("Interactive mode is not available yet. Specify a template ID.")
+        const registry = await loadRegistry(process.cwd(), options.registry)
+        await runInteractive(registry)
+        return
       }
       await executeTemplate(id, options, parsed.fields)
     })
+
+  program.addCommand(
+    createCommand("test")
+      .description("Run declared template test cases.")
+      .argument("[id]", "registry template ID")
+      .action(async (id: string | undefined) => {
+        const commandOptions = program.opts()
+        const registryPath = typeof commandOptions.registry === "string" ? commandOptions.registry : undefined
+        const registry = await loadRegistry(process.cwd(), registryPath)
+        await runRegistryTests(registry, id)
+      }),
+  )
 
   await program.parseAsync([...parsed.argv], { from: "user" })
 }

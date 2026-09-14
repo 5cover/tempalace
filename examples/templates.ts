@@ -1,0 +1,24 @@
+import { template } from "@tempalace/core"
+import { z } from "zod"
+
+const greet = template({
+  name: "Greet",
+  description: "Generate a greeting.",
+  input: z.object({
+    name: z.string(),
+    salutation: z.enum(["Hello", "Bonjour"]).default("Hello"),
+  }),
+  output: z.string(),
+  run: ({ name, salutation }) => `${salutation} ${name}`,
+  tests: [[{ name: "Ada", salutation: "Hello" }, "Hello Ada"]],
+})
+
+const summarize = template({
+  name: "Summarize",
+  description: "Return structured details for supplied text.",
+  input: z.object({ text: z.string() }),
+  output: z.object({ characters: z.number(), uppercase: z.string() }),
+  run: ({ text }) => ({ characters: text.length, uppercase: text.toUpperCase() }),
+})
+
+export default { greet, summarize }

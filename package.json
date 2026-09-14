@@ -10,5 +10,9 @@
     "build": "pnpm --recursive run build",
     "test": "pnpm --recursive run test",
     "typecheck": "pnpm --recursive run typecheck"
+  },
+  "devDependencies": {
+    "@tempalace/core": "workspace:*",
+    "zod": "^4.3.6"
   }
 }
