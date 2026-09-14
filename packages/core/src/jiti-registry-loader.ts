@@ -1,5 +1,5 @@
 import { createJiti } from "jiti"
-import { RegistryLoadError } from "./errors.js"
+import { InvalidRegistryError, RegistryLoadError } from "./errors.js"
 import { validateRegistry, type RegistryLoader, type TemplateRegistry } from "./registry.js"
 
 export class JitiRegistryLoader implements RegistryLoader {
@@ -12,7 +12,7 @@ export class JitiRegistryLoader implements RegistryLoader {
       }
       return validateRegistry(loaded.default)
     } catch (error: unknown) {
-      if (error instanceof RegistryLoadError) {
+      if (error instanceof RegistryLoadError || error instanceof InvalidRegistryError) {
         throw error
       }
       const message = error instanceof Error ? error.message : "Unable to load registry."

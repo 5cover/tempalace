@@ -23,4 +23,5 @@ test("serializes outputs predictably", () => {
   assert.equal(serializeOutput("hello", "auto"), "hello\n")
   assert.equal(serializeOutput({ ok: true }, "json"), '{\n  "ok": true\n}\n')
   assert.match(serializeOutput({ ok: true }, "yaml"), /ok: true/)
+  assert.throws(() => serializeOutput(undefined, "auto"))
 })

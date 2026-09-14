@@ -1,4 +1,5 @@
 import { input, select } from "@inquirer/prompts"
+import search from "@inquirer/search"
 import {
   InProcessTemplateExecutor,
   InputValidationError,
@@ -145,15 +146,23 @@ export async function runInteractive(registry: TemplateRegistry): Promise<void> 
   const executor = new InProcessTemplateExecutor()
 
   while (true) {
-    const id = await select({
-      message: "Choose a template",
+    const templateChoices = Object.entries(registry).map(([templateId, currentTemplate]) => ({
+      name: currentTemplate.name,
+      description: currentTemplate.description === undefined
+        ? templateId
+        : `${templateId}: ${currentTemplate.description}`,
+      value: templateId,
+    }))
+    const id = await search({
+      message: "Search templates",
       pageSize: 12,
-      choices: Object.entries(registry).map(([templateId, currentTemplate]) => ({
-        name: currentTemplate.description === undefined
-          ? `${templateId}  ${currentTemplate.name}`
-          : `${templateId}  ${currentTemplate.name}\n   ${currentTemplate.description}`,
-        value: templateId,
-      })),
+      source: (term) => {
+        const normalizedTerm = term?.trim().toLocaleLowerCase() ?? ""
+        return templateChoices.filter((choice) => {
+          const searchable = `${choice.value} ${choice.name} ${choice.description}`.toLocaleLowerCase()
+          return searchable.includes(normalizedTerm)
+        })
+      },
     })
     const currentTemplate = registry[id]
     if (currentTemplate === undefined) {

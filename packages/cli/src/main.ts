@@ -9,6 +9,7 @@ import {
 import { formatError } from "./errors.js"
 import { runInteractive } from "./interactive.js"
 import { parseTemplateArguments, readStructuredInput } from "./input.js"
+import { TerminalLogger, type CliLogger } from "./logger.js"
 import { writeOutput } from "./output.js"
 import { findRegistryPath } from "./registry.js"
 import { serializeOutput } from "./serialization.js"
@@ -58,8 +59,9 @@ async function getInput(options: DirectOptions, fields: Readonly<Record<string, 
   return { ...wholeInput, ...fields }
 }
 
-async function loadRegistry(cwd: string, registryPath?: string): Promise<TemplateRegistry> {
+async function loadRegistry(cwd: string, registryPath: string | undefined, logger: CliLogger): Promise<TemplateRegistry> {
   const path = await findRegistryPath(cwd, registryPath)
+  logger.debug(`Loading registry '${path}'.`)
   return new JitiRegistryLoader().load(path)
 }
 
@@ -67,13 +69,15 @@ async function executeTemplate(
   id: string,
   options: DirectOptions,
   fields: Readonly<Record<string, unknown>>,
+  logger: CliLogger,
 ): Promise<void> {
-  const registry = await loadRegistry(process.cwd(), options.registry)
+  const registry = await loadRegistry(process.cwd(), options.registry, logger)
   const currentTemplate = registry[id]
   if (currentTemplate === undefined) {
     throw new TemplateNotFoundError(`Template '${id}' was not found in the registry.`)
   }
   const input = await getInput(options, fields)
+  logger.debug(`Executing template '${id}'.`)
   const result = await new InProcessTemplateExecutor().execute(currentTemplate, input)
   await writeOutput(serializeOutput(result, getOutputFormat(options)), options)
 }
@@ -95,12 +99,13 @@ export async function runCli(argv: readonly string[]): Promise<void> {
     .option("-o, --output <path>", "write output to a file")
     .argument("[id]", "registry template ID")
     .action(async (id: string | undefined, options: DirectOptions) => {
+      const logger = new TerminalLogger(options.debug === true)
       if (id === undefined) {
-        const registry = await loadRegistry(process.cwd(), options.registry)
+        const registry = await loadRegistry(process.cwd(), options.registry, logger)
         await runInteractive(registry)
         return
       }
-      await executeTemplate(id, options, parsed.fields)
+      await executeTemplate(id, options, parsed.fields, logger)
     })
 
   program.addCommand(
@@ -110,7 +115,8 @@ export async function runCli(argv: readonly string[]): Promise<void> {
       .action(async (id: string | undefined) => {
         const commandOptions = program.opts()
         const registryPath = typeof commandOptions.registry === "string" ? commandOptions.registry : undefined
-        const registry = await loadRegistry(process.cwd(), registryPath)
+        const logger = new TerminalLogger(commandOptions.debug === true)
+        const registry = await loadRegistry(process.cwd(), registryPath, logger)
         await runRegistryTests(registry, id)
       }),
   )
@@ -123,7 +129,7 @@ async function main(): Promise<void> {
     await runCli(process.argv.slice(2))
   } catch (error: unknown) {
     const debug = process.argv.includes("--debug")
-    process.stderr.write(`tp: ${formatError(error, debug)}\n`)
+    new TerminalLogger(debug).error(formatError(error, debug))
     process.exitCode = 1
   }
 }

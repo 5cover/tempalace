@@ -15,7 +15,14 @@ export function serializeOutput(value: unknown, format: OutputFormat): string {
     if (format === "yaml") {
       return stringifyYaml(value)
     }
-    return typeof value === "string" ? `${value}\n` : `${JSON.stringify(value, null, 2)}\n`
+    if (typeof value === "string") {
+      return `${value}\n`
+    }
+    const output = JSON.stringify(value, null, 2)
+    if (output === undefined) {
+      throw new SerializationError("Output cannot be represented as JSON.")
+    }
+    return `${output}\n`
   } catch (error: unknown) {
     if (error instanceof SerializationError) {
       throw error

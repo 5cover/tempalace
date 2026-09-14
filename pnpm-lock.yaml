@@ -23,6 +23,9 @@ importers:
       '@inquirer/prompts':
         specifier: ^8.3.0
         version: 8.7.2(@types/node@24.13.4)
+      '@inquirer/search':
+        specifier: ^4.3.3
+        version: 4.3.3(@types/node@24.13.4)
       '@tempalace/core':
         specifier: workspace:*
         version: link:../core

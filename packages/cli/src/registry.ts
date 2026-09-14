@@ -10,7 +10,7 @@ const REGISTRY_FILENAMES = [
   "templates.js",
   "templates.mjs",
   "templates.cjs",
-] as const
+] satisfies readonly string[]
 
 export async function findRegistryPath(cwd: string, registryPath?: string): Promise<string> {
   if (registryPath !== undefined) {
