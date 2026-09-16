@@ -1,6 +1,36 @@
-import * as z from 'zod'
+import * as z from "zod"
 
-export interface Template<I, O> {
+interface TemplateMetadata<OutputSchema extends z.ZodType> {
+  readonly name: string
+  readonly description?: string
+  readonly output: OutputSchema
+}
+
+export type TemplateTestCase<I, O> = readonly [input: I, expectedOutput: O]
+
+export interface TemplateDefinition<OutputSchema extends z.ZodType>
+  extends TemplateMetadata<OutputSchema> {
+  readonly run: () => z.infer<OutputSchema> | Promise<z.infer<OutputSchema>>
+  readonly tests?: readonly TemplateTestCase<undefined, z.infer<OutputSchema>>[]
+}
+
+export type ParameterizedTemplateDefinition<InputSchema extends z.ZodType, OutputSchema extends z.ZodType> =
+  Omit<TemplateDefinition<OutputSchema>, "run" | "tests"> & {
+    readonly input: InputSchema
+    readonly run: (input: z.infer<InputSchema>) => z.infer<OutputSchema> | Promise<z.infer<OutputSchema>>
+    readonly tests?: readonly TemplateTestCase<z.infer<InputSchema>, z.infer<OutputSchema>>[]
+  }
+
+export interface InputlessTemplate<O> {
+  readonly name: string
+  readonly description?: string
+  readonly input?: never
+  readonly output: z.ZodType<O>
+  readonly run: () => O | Promise<O>
+  readonly tests?: readonly TemplateTestCase<undefined, O>[]
+}
+
+export interface ParameterizedTemplate<I, O> {
   readonly name: string
   readonly description?: string
   readonly input: z.ZodType<I>
@@ -9,22 +39,22 @@ export interface Template<I, O> {
   readonly tests?: readonly TemplateTestCase<I, O>[]
 }
 
-export type TemplateTestCase<I, O> = readonly [input: I, expectedOutput: O]
+export type Template<I, O> = InputlessTemplate<O> | ParameterizedTemplate<I, O>
 
-export interface TemplateDefinition<InputSchema extends z.ZodType, OutputSchema extends z.ZodType> {
-  readonly name: string
-  readonly description?: string
-  readonly input: InputSchema
-  readonly output: OutputSchema
-  readonly run: (input: z.infer<InputSchema>) => z.infer<OutputSchema> | Promise<z.infer<OutputSchema>>
-  readonly tests?: readonly TemplateTestCase<z.infer<InputSchema>, z.infer<OutputSchema>>[]
+export function isParameterizedTemplate<I, O>(
+  currentTemplate: Template<I, O>,
+): currentTemplate is ParameterizedTemplate<I, O> {
+  return currentTemplate.input !== undefined
 }
 
 export function template<InputSchema extends z.ZodType, OutputSchema extends z.ZodType>(
-  definition: TemplateDefinition<InputSchema, OutputSchema>
-): Template<z.infer<InputSchema>, z.infer<OutputSchema>> {
-  // The generic Zod declaration cannot express that an arbitrary schema's
-  // output is the input accepted by its associated callback. The definition
-  // type enforces that relationship at the constructor boundary.
-  return { ...definition } as Template<z.infer<InputSchema>, z.infer<OutputSchema>>
+  definition: ParameterizedTemplateDefinition<InputSchema, OutputSchema>,
+): ParameterizedTemplate<z.infer<InputSchema>, z.infer<OutputSchema>>
+export function template<OutputSchema extends z.ZodType>(
+  definition: TemplateDefinition<OutputSchema>,
+): InputlessTemplate<z.infer<OutputSchema>>
+export function template(
+  definition: TemplateDefinition<z.ZodType> | ParameterizedTemplateDefinition<z.ZodType, z.ZodType>,
+): Template<unknown, unknown> {
+  return definition
 }

@@ -62,6 +62,16 @@ const releaseNotes = template({
 
 Composition remains normal code. If one template needs another, import it and call `await other.run(input)` in its implementation. Tempalace deliberately has no CLI composition syntax.
 
+Templates without input simply omit `input`; their `run` callback receives no argument. The CLI invokes them immediately after selection and does not show an input prompt.
+
+```ts
+const version = template({
+  name: "Version",
+  output: z.string(),
+  run: () => "1.0.0",
+})
+```
+
 ## Running templates
 
 Registry keys are stable CLI IDs; template names are human-facing. `tp` discovers one registry in the current directory, without looking in parent directories. The filename precedence is `templates.ts`, `templates.mts`, `templates.cts`, `templates.js`, `templates.mjs`, then `templates.cjs`.
@@ -76,6 +86,7 @@ tp -r path/to/templates.ts greet +name Ada
 
 ```sh
 tp greet +name Ada --json
+tp version
 ```
 
 Scalar `+` values are always strings. Tempalace does not convert `"1"`, `"true"`, or `"null"` automatically. Use an explicit structured representation for non-string data:

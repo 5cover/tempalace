@@ -9,6 +9,8 @@ tp test [id] [options]
 
 `tp` with no ID opens the interactive selector. `tp <id>` invokes that registry entry. The optional long executable name is `tempalace`.
 
+An input-less template is selected and run without an input prompt. Directly invoke one with `tp <id>`; providing `+` arguments or `--input-json` or `--input-yaml` for it is an error.
+
 ## Global options
 
 | Option | Meaning |

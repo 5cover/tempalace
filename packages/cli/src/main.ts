@@ -2,8 +2,10 @@
 import { createCommand } from "@commander-js/extra-typings"
 import {
   InProcessTemplateExecutor,
+  InputValidationError,
   JitiRegistryLoader,
   TemplateNotFoundError,
+  isParameterizedTemplate,
   type TemplateRegistry,
 } from "@tempalace/core"
 import { formatError } from "./errors.js"
@@ -75,6 +77,15 @@ async function executeTemplate(
   const currentTemplate = registry[id]
   if (currentTemplate === undefined) {
     throw new TemplateNotFoundError(`Template '${id}' was not found in the registry.`)
+  }
+  if (!isParameterizedTemplate(currentTemplate)) {
+    if (Object.keys(fields).length > 0 || options.inputJson !== undefined || options.inputYaml !== undefined) {
+      throw new InputValidationError(`Template '${id}' does not accept input.`, [])
+    }
+    logger.debug(`Executing input-less template '${id}'.`)
+    const result = await new InProcessTemplateExecutor().execute(currentTemplate, undefined)
+    await writeOutput(serializeOutput(result, getOutputFormat(options)), options)
+    return
   }
   const input = await getInput(options, fields)
   logger.debug(`Executing template '${id}'.`)

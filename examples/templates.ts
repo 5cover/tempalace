@@ -21,4 +21,12 @@ const summarize = template({
   run: ({ text }) => ({ characters: text.length, uppercase: text.toUpperCase() }),
 })
 
-export default { greet, summarize }
+const version = template({
+  name: "Version",
+  description: "Report the example registry version.",
+  output: z.string(),
+  run: () => "1.0.0",
+  tests: [[undefined, "1.0.0"]],
+})
+
+export default { greet, summarize, version }

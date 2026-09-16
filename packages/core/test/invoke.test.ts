@@ -31,6 +31,17 @@ test("normalizes asynchronous template execution", async () => {
   assert.equal(await invoke(delayed, "Ada"), 3)
 })
 
+test("invokes an input-less template without prompting for or validating input", async () => {
+  const version = template({
+    name: "Version",
+    output: z.string(),
+    run: () => "1.0.0",
+    tests: [[undefined, "1.0.0"]],
+  })
+
+  assert.equal(await invoke(version), "1.0.0")
+})
+
 test("reports input validation failures", async () => {
   const currentTemplate = template({
     name: "String",

@@ -3,7 +3,9 @@
 ## `Template<I, O>`
 
 ```ts
-interface Template<I, O> {
+type Template<I, O> = InputlessTemplate<O> | ParameterizedTemplate<I, O>
+
+interface ParameterizedTemplate<I, O> {
   readonly name: string
   readonly description?: string
   readonly input: ZodType<I>
@@ -13,7 +15,7 @@ interface Template<I, O> {
 }
 ```
 
-Use `template()` rather than manually creating a template. It preserves schema inference for `run`.
+`InputlessTemplate<O>` has no `input` property and has `run(): O | Promise<O>`. Use `template()` rather than manually creating either variant. It preserves schema inference for `run`.
 
 ## `template()`
 
@@ -24,14 +26,21 @@ const greeting = template({
   output: z.string(),
   run: ({ name }) => `Hello ${name}`,
 })
+
+const version = template({
+  name: "Version",
+  output: z.string(),
+  run: () => "1.0.0",
+})
 ```
 
-The callback may return a value or a promise.
+Omit `input` for a template with no input. The callback may return a value or a promise. `TemplateDefinition<OutputSchema>` describes this input-less form; `ParameterizedTemplateDefinition<InputSchema, OutputSchema>` adds the input schema, parameterized callback, and parameterized test cases.
 
 ## `invoke()`
 
 ```ts
 const result = await invoke(greeting, { name: "Ada" })
+const currentVersion = await invoke(version)
 ```
 
 It parses raw input, calls and awaits `run`, parses the output, then returns the validated output. Input validation cannot be skipped. To skip only output validation, use `invoke(template, input, { validateOutput: false })`.
@@ -52,7 +61,7 @@ interface RegistryLoader {
 
 ## Test cases
 
-`TemplateTestCase<I, O>` is a readonly `[input, expectedOutput]` tuple. `runTemplateTests(template)` executes declared cases with deep strict equality and returns a result containing `passed` and `failures`. It does not require a particular test framework; ordinary `node:test` remains appropriate for advanced assertions.
+`TemplateTestCase<I, O>` is a readonly `[input, expectedOutput]` tuple. Input-less template cases use `undefined` for input, for example `[undefined, "1.0.0"]`. `runTemplateTests(template)` executes declared cases with deep strict equality and returns a result containing `passed` and `failures`. It does not require a particular test framework; ordinary `node:test` remains appropriate for advanced assertions.
 
 ## Extension interfaces
 

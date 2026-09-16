@@ -4,6 +4,8 @@
 
 A `Template<I, O>` holds a human-facing `name`, optional `description`, Zod `input` and `output` schemas, and `run(input)`. The `template()` constructor connects schema inference to `run` so TypeScript detects mismatches. `invoke()` always validates input, awaits synchronous or asynchronous functions uniformly, and validates output unless explicitly disabled.
 
+Templates may also omit `input`. Their callback is `run()` and `invoke(template)` executes them without input parsing. The CLI recognizes this variant and skips input collection completely.
+
 The result returned by core is the validated JavaScript value. Rendering is exclusively a CLI concern.
 
 ## Registries and loading

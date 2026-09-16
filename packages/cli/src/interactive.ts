@@ -4,6 +4,7 @@ import {
   InProcessTemplateExecutor,
   InputValidationError,
   TemplateExecutionError,
+  isParameterizedTemplate,
   type Template,
   type TemplateRegistry,
 } from "@tempalace/core"
@@ -80,6 +81,10 @@ async function collectStructuredField(fieldName: string): Promise<unknown> {
 }
 
 async function collectObjectInput(currentTemplate: Template<unknown, unknown>): Promise<unknown> {
+  if (!isParameterizedTemplate(currentTemplate)) {
+    return undefined
+  }
+
   if (!(currentTemplate.input instanceof z.ZodObject)) {
     return collectStructuredField("input")
   }

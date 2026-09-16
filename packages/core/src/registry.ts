@@ -12,11 +12,13 @@ function isTemplate(value: unknown): value is Template<unknown, unknown> {
     return false
   }
 
+  const hasValidInput = value.input === undefined
+    || (value.input !== null && typeof value.input === "object")
+
   return typeof value.name === "string"
     && (value.description === undefined || typeof value.description === "string")
     && typeof value.run === "function"
-    && value.input !== null
-    && typeof value.input === "object"
+    && hasValidInput
     && value.output !== null
     && typeof value.output === "object"
 }
