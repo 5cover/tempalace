@@ -1,4 +1,4 @@
-import type * as z from 'zod'
+import * as z from 'zod'
 
 export interface Template<I, O> {
   readonly name: string
@@ -26,5 +26,5 @@ export function template<InputSchema extends z.ZodType, OutputSchema extends z.Z
   // The generic Zod declaration cannot express that an arbitrary schema's
   // output is the input accepted by its associated callback. The definition
   // type enforces that relationship at the constructor boundary.
-  return definition as Template<z.infer<InputSchema>, z.infer<OutputSchema>>
+  return { ...definition } as Template<z.infer<InputSchema>, z.infer<OutputSchema>>
 }
