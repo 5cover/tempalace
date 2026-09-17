@@ -2,6 +2,24 @@
   "name": "tempalace",
   "version": "0.1.0",
   "description": "Interactive CLI for Tempalace templates",
+  "keywords": [
+    "templates",
+    "cli",
+    "zod",
+    "typescript",
+    "interactive"
+  ],
+  "license": "MIT",
+  "author": "Scover",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/5cover/tempalace.git",
+    "directory": "packages/cli"
+  },
+  "bugs": {
+    "url": "https://github.com/5cover/tempalace/issues"
+  },
+  "homepage": "https://github.com/5cover/tempalace#readme",
   "type": "module",
   "bin": {
     "tp": "./dist/main.js",
@@ -13,9 +31,10 @@
       "import": "./dist/index.js"
     }
   },
-  "files": [
-    "dist"
-  ],
+  "files": ["dist", "README.md", "LICENSE"],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "pretypecheck": "pnpm --filter @tempalace/core build",

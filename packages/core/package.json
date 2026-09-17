@@ -2,6 +2,23 @@
   "name": "@tempalace/core",
   "version": "0.1.0",
   "description": "Typed template primitives for Tempalace",
+  "keywords": [
+    "templates",
+    "zod",
+    "typescript",
+    "cli"
+  ],
+  "license": "MIT",
+  "author": "Scover",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/5cover/tempalace.git",
+    "directory": "packages/core"
+  },
+  "bugs": {
+    "url": "https://github.com/5cover/tempalace/issues"
+  },
+  "homepage": "https://github.com/5cover/tempalace#readme",
   "type": "module",
   "exports": {
     ".": {
@@ -9,9 +26,10 @@
       "import": "./dist/index.js"
     }
   },
-  "files": [
-    "dist"
-  ],
+  "files": ["dist", "README.md", "LICENSE"],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc --noEmit -p tsconfig.json",
