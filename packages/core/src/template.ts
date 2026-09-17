@@ -25,7 +25,7 @@ export type ParameterizedTemplateDefinition<InputSchema extends z.ZodType, Outpu
 export interface InputlessTemplate<O> {
   readonly name: string
   readonly description?: string
-  readonly output: z.ZodType<O>
+  readonly output: z.ZodType<O, O>
   readonly run: () => O | Promise<O>
   readonly tests?: readonly TemplateTestCase<undefined, O>[]
 }
@@ -33,8 +33,8 @@ export interface InputlessTemplate<O> {
 export interface ParameterizedTemplate<I, O> {
   readonly name: string
   readonly description?: string
-  readonly input: z.ZodType<I>
-  readonly output: z.ZodType<O>
+  readonly input: z.ZodType<I, I>
+  readonly output: z.ZodType<O, O>
   readonly run: (input: I) => O | Promise<O>
   readonly tests?: readonly TemplateTestCase<I, O>[]
 }
