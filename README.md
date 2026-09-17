@@ -96,9 +96,11 @@ tp deploy +config:json '{"enabled":true}'
 tp deploy +config:yaml 'enabled: true'
 tp deploy --input-json '{"name":"Ada"}'
 printf 'name: Ada\n' | tp deploy --input-yaml -
+tp uppercase --input 'Ada'
+tp square --input-json '42'
 ```
 
-The root structured payload must be an object. A field cannot be supplied both in a root payload and through `+field`.
+`--input` passes its value directly as a string. `--input-json` and `--input-yaml` can represent any value accepted by the schema, including strings, numbers, booleans, arrays, objects, and null. Use only one whole-input option. `+field` arguments may be combined with a structured object, but not with a primitive whole input.
 
 ## Interactive use
 

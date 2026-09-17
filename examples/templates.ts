@@ -1,5 +1,4 @@
-import { template } from '@tempalace/core'
-import { z } from 'zod'
+import { template, zod as z } from '@tempalace/core'
 
 const greet = template({
   name: 'Greet',
@@ -32,4 +31,13 @@ const version = template({
   tests: [[undefined, '1.0.0']],
 })
 
-export default { greet, summarize, version }
+const uppercase = template({
+  name: 'Uppercase',
+  description: 'Convert a string input to uppercase.',
+  input: z.string(),
+  output: z.string(),
+  run: (value) => value.toUpperCase(),
+  tests: [['Ada', 'ADA']],
+})
+
+export default { greet, summarize, version, uppercase }

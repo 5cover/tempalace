@@ -10,7 +10,7 @@ import {
 } from '@tempalace/core'
 import { formatError } from './errors.js'
 import { runInteractive } from './interactive.js'
-import { parseTemplateArguments, readStructuredInput } from './input.js'
+import { parseTemplateArguments, resolveInvocationInput } from './input.js'
 import { TerminalLogger, type CliLogger } from './logger.js'
 import { writeOutput } from './output.js'
 import { findRegistryPath } from './registry.js'
@@ -21,6 +21,7 @@ interface DirectOptions {
   readonly registry?: string
   readonly debug?: boolean
   readonly nonInteractive?: boolean
+  readonly input?: string
   readonly inputJson?: string
   readonly inputYaml?: string
   readonly json?: boolean
@@ -37,29 +38,6 @@ function getOutputFormat(options: DirectOptions): 'auto' | 'json' | 'yaml' {
     return 'json'
   }
   return options.yaml === true ? 'yaml' : 'auto'
-}
-
-async function getInput(options: DirectOptions, fields: Readonly<Record<string, unknown>>): Promise<unknown> {
-  if (options.inputJson !== undefined && options.inputYaml !== undefined) {
-    throw new Error('Use either --input-json or --input-yaml, not both.')
-  }
-  const wholeInput =
-    options.inputJson !== undefined
-      ? await readStructuredInput(options.inputJson, 'json')
-      : options.inputYaml !== undefined
-        ? await readStructuredInput(options.inputYaml, 'yaml')
-        : {}
-
-  if (wholeInput === null || typeof wholeInput !== 'object' || Array.isArray(wholeInput)) {
-    throw new Error('Whole structured input must be an object.')
-  }
-
-  for (const key of Object.keys(fields)) {
-    if (Object.hasOwn(wholeInput, key)) {
-      throw new Error(`Input '${key}' was provided both as structured input and a + argument.`)
-    }
-  }
-  return { ...wholeInput, ...fields }
 }
 
 async function loadRegistry(
@@ -84,7 +62,12 @@ async function executeTemplate(
     throw new TemplateNotFoundError(`Template '${id}' was not found in the registry.`)
   }
   if (!isParameterizedTemplate(currentTemplate)) {
-    if (Object.keys(fields).length > 0 || options.inputJson !== undefined || options.inputYaml !== undefined) {
+    if (
+      Object.keys(fields).length > 0
+      || options.input !== undefined
+      || options.inputJson !== undefined
+      || options.inputYaml !== undefined
+    ) {
       throw new InputValidationError(`Template '${id}' does not accept input.`, [])
     }
     logger.debug(`Executing input-less template '${id}'.`)
@@ -92,7 +75,7 @@ async function executeTemplate(
     await writeOutput(serializeOutput(result, getOutputFormat(options)), options)
     return
   }
-  const input = await getInput(options, fields)
+  const input = await resolveInvocationInput(options, fields)
   logger.debug(`Executing template '${id}'.`)
   const result = await new InProcessTemplateExecutor().execute(currentTemplate, input)
   await writeOutput(serializeOutput(result, getOutputFormat(options)), options)
@@ -107,6 +90,7 @@ export async function runCli(argv: readonly string[]): Promise<void> {
     .option('-r, --registry <path>', 'registry file path')
     .option('--debug', 'show exception stacks')
     .option('--non-interactive', 'fail instead of prompting for missing input')
+    .option('--input <text>', 'whole input as plain text')
     .option('--input-json <json>', 'whole input as JSON, or - for stdin')
     .option('--input-yaml <yaml>', 'whole input as YAML, or - for stdin')
     .option('--json', 'serialize output as JSON')

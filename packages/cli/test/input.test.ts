@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 import { InputValidationError } from '@tempalace/core'
-import { parseTemplateArguments } from '../src/input.js'
+import { parseTemplateArguments, resolveInvocationInput } from '../src/input.js'
 import { serializeOutput } from '../src/serialization.js'
 
 test('keeps scalar + arguments as strings', () => {
@@ -20,6 +20,34 @@ test('parses explicitly structured field values', () => {
 test('rejects malformed or repeated + arguments', () => {
   assert.throws(() => parseTemplateArguments(['greet', '+name']), InputValidationError)
   assert.throws(() => parseTemplateArguments(['greet', '+name', 'Ada', '+name', 'Lin']), InputValidationError)
+})
+
+test('accepts primitive whole JSON, YAML, and plain-text input', async () => {
+  assert.equal(await resolveInvocationInput({ input: 'Ada' }, {}), 'Ada')
+  assert.equal(await resolveInvocationInput({ inputJson: '42' }, {}), 42)
+  assert.equal(await resolveInvocationInput({ inputYaml: 'true' }, {}), true)
+})
+
+test('combines + arguments only with structured object input', async () => {
+  assert.deepEqual(
+    await resolveInvocationInput({ inputJson: '{"name":"Ada"}' }, { salutation: 'Hello' }),
+    { name: 'Ada', salutation: 'Hello' },
+  )
+  await assert.rejects(
+    resolveInvocationInput({ inputJson: '42' }, { value: 'Ada' }),
+    InputValidationError,
+  )
+  await assert.rejects(
+    resolveInvocationInput({ input: 'Ada' }, { value: 'Ada' }),
+    InputValidationError,
+  )
+})
+
+test('rejects more than one whole-input representation', async () => {
+  await assert.rejects(
+    resolveInvocationInput({ input: 'Ada', inputJson: '"Ada"' }, {}),
+    InputValidationError,
+  )
 })
 
 test('serializes outputs predictably', () => {

@@ -9,7 +9,7 @@ tp test [id] [options]
 
 `tp` with no ID opens the interactive selector. `tp <id>` invokes that registry entry. The optional long executable name is `tempalace`.
 
-An input-less template is selected and run without an input prompt. Directly invoke one with `tp <id>`; providing `+` arguments or `--input-json` or `--input-yaml` for it is an error.
+An input-less template is selected and run without an input prompt. Directly invoke one with `tp <id>`; providing `+` arguments, `--input`, `--input-json`, or `--input-yaml` for it is an error.
 
 ## Global options
 
@@ -28,12 +28,13 @@ An input-less template is selected and run without an input prompt. Directly inv
 | `+name Ada`                     | Pass the string `"Ada"` to `name`.  |
 | `+config:json '{"a":1}'`        | Parse only `config` as JSON.        |
 | `+config:yaml 'a: 1'`           | Parse only `config` as YAML.        |
-| `--input-json '{"name":"Ada"}'` | Parse a whole object input as JSON. |
-| `--input-yaml 'name: Ada'`      | Parse a whole object input as YAML. |
-| `--input-json -`                | Read a JSON object from stdin.      |
-| `--input-yaml -`                | Read a YAML object from stdin.      |
+| `--input 'Ada'`                 | Pass `"Ada"` directly as a string. |
+| `--input-json '42'`             | Parse any whole input as JSON.      |
+| `--input-yaml 'name: Ada'`      | Parse any whole input as YAML.      |
+| `--input-json -`                | Read any JSON value from stdin.     |
+| `--input-yaml -`                | Read any YAML value from stdin.     |
 
-Scalar values are never coerced. A numeric Zod schema therefore requires explicit JSON or YAML unless the template author accepts and transforms a string.
+`--input` and `+` values are strings and are never coerced. A numeric Zod schema therefore requires explicit JSON or YAML unless the template author accepts and transforms a string. Use only one whole-input option. `+` arguments may combine with an object supplied by JSON or YAML, but cannot combine with a primitive whole input.
 
 ## Output options
 
@@ -63,6 +64,8 @@ tp greet +name Ada
 tp summarize +text Ada --json
 tp deploy +config:json '{"enabled":true}' -o deploy-result.json
 printf '{"name":"Ada"}' | tp greet --input-json -
+tp uppercase --input Ada
+tp square --input-json 42
 ```
 
 Registry discovery checks only the current directory in this order: `templates.ts`, `templates.mts`, `templates.cts`, `templates.js`, `templates.mjs`, `templates.cjs`.

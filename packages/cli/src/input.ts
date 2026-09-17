@@ -8,6 +8,12 @@ export interface ParsedTemplateArguments {
   readonly fields: Readonly<Record<string, unknown>>
 }
 
+export interface InvocationInputOptions {
+  readonly input?: string
+  readonly inputJson?: string
+  readonly inputYaml?: string
+}
+
 function parseStructuredValue(value: string, format: StructuredFormat): unknown {
   try {
     return format === 'json' ? JSON.parse(value) : parseYaml(value)
@@ -20,6 +26,55 @@ function parseStructuredValue(value: string, format: StructuredFormat): unknown 
 export async function readStructuredInput(value: string, format: StructuredFormat): Promise<unknown> {
   const source = value === '-' ? await readStandardInput() : value
   return parseStructuredValue(source, format)
+}
+
+export async function resolveInvocationInput(
+  options: InvocationInputOptions,
+  fields: Readonly<Record<string, unknown>>,
+): Promise<unknown> {
+  const sources = [options.input, options.inputJson, options.inputYaml]
+    .filter((source): source is string => source !== undefined)
+  if (sources.length > 1) {
+    throw new InputValidationError("Use only one of --input, --input-json, or --input-yaml.", [])
+  }
+
+  if (options.input !== undefined) {
+    if (Object.keys(fields).length > 0) {
+      throw new InputValidationError("--input cannot be combined with + arguments.", [])
+    }
+    return options.input
+  }
+
+  const hasStructuredInput = options.inputJson !== undefined || options.inputYaml !== undefined
+  const structuredInput = options.inputJson !== undefined
+    ? await readStructuredInput(options.inputJson, "json")
+    : options.inputYaml !== undefined
+      ? await readStructuredInput(options.inputYaml, "yaml")
+      : undefined
+
+  if (!hasStructuredInput) {
+    return fields
+  }
+  if (Object.keys(fields).length === 0) {
+    return structuredInput
+  }
+  if (!isObjectRecord(structuredInput)) {
+    throw new InputValidationError(
+      "+ arguments can only be combined with an object supplied through --input-json or --input-yaml.",
+      [],
+    )
+  }
+
+  for (const key of Object.keys(fields)) {
+    if (Object.hasOwn(structuredInput, key)) {
+      throw new InputValidationError(`Input '${key}' was provided both as structured input and a + argument.`, [])
+    }
+  }
+  return { ...structuredInput, ...fields }
+}
+
+function isObjectRecord(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === "object" && !Array.isArray(value)
 }
 
 async function readStandardInput(): Promise<string> {
