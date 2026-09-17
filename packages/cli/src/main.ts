@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { createCommand } from "@commander-js/extra-typings"
+import { createCommand } from '@commander-js/extra-typings'
 import {
   InProcessTemplateExecutor,
   InputValidationError,
@@ -7,15 +7,15 @@ import {
   TemplateNotFoundError,
   isParameterizedTemplate,
   type TemplateRegistry,
-} from "@tempalace/core"
-import { formatError } from "./errors.js"
-import { runInteractive } from "./interactive.js"
-import { parseTemplateArguments, readStructuredInput } from "./input.js"
-import { TerminalLogger, type CliLogger } from "./logger.js"
-import { writeOutput } from "./output.js"
-import { findRegistryPath } from "./registry.js"
-import { serializeOutput } from "./serialization.js"
-import { runRegistryTests } from "./testing.js"
+} from '@tempalace/core'
+import { formatError } from './errors.js'
+import { runInteractive } from './interactive.js'
+import { parseTemplateArguments, readStructuredInput } from './input.js'
+import { TerminalLogger, type CliLogger } from './logger.js'
+import { writeOutput } from './output.js'
+import { findRegistryPath } from './registry.js'
+import { serializeOutput } from './serialization.js'
+import { runRegistryTests } from './testing.js'
 
 interface DirectOptions {
   readonly registry?: string
@@ -29,28 +29,29 @@ interface DirectOptions {
   readonly output?: string
 }
 
-function getOutputFormat(options: DirectOptions): "auto" | "json" | "yaml" {
+function getOutputFormat(options: DirectOptions): 'auto' | 'json' | 'yaml' {
   if (options.json === true && options.yaml === true) {
-    throw new Error("Use either --json or --yaml, not both.")
+    throw new Error('Use either --json or --yaml, not both.')
   }
   if (options.json === true) {
-    return "json"
+    return 'json'
   }
-  return options.yaml === true ? "yaml" : "auto"
+  return options.yaml === true ? 'yaml' : 'auto'
 }
 
 async function getInput(options: DirectOptions, fields: Readonly<Record<string, unknown>>): Promise<unknown> {
   if (options.inputJson !== undefined && options.inputYaml !== undefined) {
-    throw new Error("Use either --input-json or --input-yaml, not both.")
+    throw new Error('Use either --input-json or --input-yaml, not both.')
   }
-  const wholeInput = options.inputJson !== undefined
-    ? await readStructuredInput(options.inputJson, "json")
-    : options.inputYaml !== undefined
-      ? await readStructuredInput(options.inputYaml, "yaml")
-      : {}
+  const wholeInput =
+    options.inputJson !== undefined
+      ? await readStructuredInput(options.inputJson, 'json')
+      : options.inputYaml !== undefined
+        ? await readStructuredInput(options.inputYaml, 'yaml')
+        : {}
 
-  if (wholeInput === null || typeof wholeInput !== "object" || Array.isArray(wholeInput)) {
-    throw new Error("Whole structured input must be an object.")
+  if (wholeInput === null || typeof wholeInput !== 'object' || Array.isArray(wholeInput)) {
+    throw new Error('Whole structured input must be an object.')
   }
 
   for (const key of Object.keys(fields)) {
@@ -61,7 +62,11 @@ async function getInput(options: DirectOptions, fields: Readonly<Record<string, 
   return { ...wholeInput, ...fields }
 }
 
-async function loadRegistry(cwd: string, registryPath: string | undefined, logger: CliLogger): Promise<TemplateRegistry> {
+async function loadRegistry(
+  cwd: string,
+  registryPath: string | undefined,
+  logger: CliLogger
+): Promise<TemplateRegistry> {
   const path = await findRegistryPath(cwd, registryPath)
   logger.debug(`Loading registry '${path}'.`)
   return new JitiRegistryLoader().load(path)
@@ -71,7 +76,7 @@ async function executeTemplate(
   id: string,
   options: DirectOptions,
   fields: Readonly<Record<string, unknown>>,
-  logger: CliLogger,
+  logger: CliLogger
 ): Promise<void> {
   const registry = await loadRegistry(process.cwd(), options.registry, logger)
   const currentTemplate = registry[id]
@@ -96,19 +101,19 @@ async function executeTemplate(
 export async function runCli(argv: readonly string[]): Promise<void> {
   const parsed = parseTemplateArguments(argv)
   const program = createCommand()
-    .name("tp")
-    .description("Discover and run reusable schema-described templates.")
-    .version("0.1.0")
-    .option("-r, --registry <path>", "registry file path")
-    .option("--debug", "show exception stacks")
-    .option("--non-interactive", "fail instead of prompting for missing input")
-    .option("--input-json <json>", "whole input as JSON, or - for stdin")
-    .option("--input-yaml <yaml>", "whole input as YAML, or - for stdin")
-    .option("--json", "serialize output as JSON")
-    .option("--yaml", "serialize output as YAML")
-    .option("-c, --clipboard", "copy output to the system clipboard")
-    .option("-o, --output <path>", "write output to a file")
-    .argument("[id]", "registry template ID")
+    .name('tp')
+    .description('Discover and run reusable schema-described templates.')
+    .version('0.1.0')
+    .option('-r, --registry <path>', 'registry file path')
+    .option('--debug', 'show exception stacks')
+    .option('--non-interactive', 'fail instead of prompting for missing input')
+    .option('--input-json <json>', 'whole input as JSON, or - for stdin')
+    .option('--input-yaml <yaml>', 'whole input as YAML, or - for stdin')
+    .option('--json', 'serialize output as JSON')
+    .option('--yaml', 'serialize output as YAML')
+    .option('-c, --clipboard', 'copy output to the system clipboard')
+    .option('-o, --output <path>', 'write output to a file')
+    .argument('[id]', 'registry template ID')
     .action(async (id: string | undefined, options: DirectOptions) => {
       const logger = new TerminalLogger(options.debug === true)
       if (id === undefined) {
@@ -120,26 +125,26 @@ export async function runCli(argv: readonly string[]): Promise<void> {
     })
 
   program.addCommand(
-    createCommand("test")
-      .description("Run declared template test cases.")
-      .argument("[id]", "registry template ID")
+    createCommand('test')
+      .description('Run declared template test cases.')
+      .argument('[id]', 'registry template ID')
       .action(async (id: string | undefined) => {
         const commandOptions = program.opts()
-        const registryPath = typeof commandOptions.registry === "string" ? commandOptions.registry : undefined
+        const registryPath = typeof commandOptions.registry === 'string' ? commandOptions.registry : undefined
         const logger = new TerminalLogger(commandOptions.debug === true)
         const registry = await loadRegistry(process.cwd(), registryPath, logger)
         await runRegistryTests(registry, id)
-      }),
+      })
   )
 
-  await program.parseAsync([...parsed.argv], { from: "user" })
+  await program.parseAsync([...parsed.argv], { from: 'user' })
 }
 
 async function main(): Promise<void> {
   try {
     await runCli(process.argv.slice(2))
   } catch (error: unknown) {
-    const debug = process.argv.includes("--debug")
+    const debug = process.argv.includes('--debug')
     new TerminalLogger(debug).error(formatError(error, debug))
     process.exitCode = 1
   }

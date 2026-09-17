@@ -12,7 +12,15 @@
     "typecheck": "pnpm --recursive run typecheck"
   },
   "devDependencies": {
-    "@tempalace/core": "workspace:*",
-    "zod": "^4.3.6"
+    "@tempalace/core": "workspace:*"
+  },
+  "prettier": {
+    "printWidth": 120,
+    "tabWidth": 2,
+    "singleQuote": true,
+    "arrowParens": "avoid",
+    "bracketSameLine": true,
+    "trailingComma": "es5",
+    "semi": false
   }
 }

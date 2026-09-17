@@ -1,4 +1,4 @@
-import type { Template } from "./template.js"
+import type { Template } from './template.js'
 
 export interface GrammarSource {
   readonly path: string

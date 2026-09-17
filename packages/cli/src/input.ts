@@ -1,7 +1,7 @@
-import { parse as parseYaml } from "yaml"
-import { InputValidationError } from "@tempalace/core"
+import { parse as parseYaml } from 'yaml'
+import { InputValidationError } from '@tempalace/core'
 
-export type StructuredFormat = "json" | "yaml"
+export type StructuredFormat = 'json' | 'yaml'
 
 export interface ParsedTemplateArguments {
   readonly argv: readonly string[]
@@ -10,15 +10,15 @@ export interface ParsedTemplateArguments {
 
 function parseStructuredValue(value: string, format: StructuredFormat): unknown {
   try {
-    return format === "json" ? JSON.parse(value) : parseYaml(value)
+    return format === 'json' ? JSON.parse(value) : parseYaml(value)
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : "Invalid structured input."
+    const message = error instanceof Error ? error.message : 'Invalid structured input.'
     throw new InputValidationError(`Could not parse ${format.toUpperCase()} input: ${message}`, [])
   }
 }
 
 export async function readStructuredInput(value: string, format: StructuredFormat): Promise<unknown> {
-  const source = value === "-" ? await readStandardInput() : value
+  const source = value === '-' ? await readStandardInput() : value
   return parseStructuredValue(source, format)
 }
 
@@ -27,7 +27,7 @@ async function readStandardInput(): Promise<string> {
   for await (const chunk of process.stdin) {
     chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(String(chunk)))
   }
-  return Buffer.concat(chunks).toString("utf8")
+  return Buffer.concat(chunks).toString('utf8')
 }
 
 export function parseTemplateArguments(argv: readonly string[]): ParsedTemplateArguments {
@@ -39,7 +39,7 @@ export function parseTemplateArguments(argv: readonly string[]): ParsedTemplateA
     if (token === undefined) {
       continue
     }
-    if (!token.startsWith("+")) {
+    if (!token.startsWith('+')) {
       remaining.push(token)
       continue
     }
@@ -53,7 +53,7 @@ export function parseTemplateArguments(argv: readonly string[]): ParsedTemplateA
       throw new InputValidationError(`Invalid template argument '${token}'.`, [])
     }
     const suffix = match[2]
-    const format: StructuredFormat | undefined = suffix === "json" || suffix === "yaml" ? suffix : undefined
+    const format: StructuredFormat | undefined = suffix === 'json' || suffix === 'yaml' ? suffix : undefined
     const value = argv[index + 1]
     if (value === undefined) {
       throw new InputValidationError(`Missing value for '${token}'.`, [])

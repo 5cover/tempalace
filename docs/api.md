@@ -21,16 +21,16 @@ interface ParameterizedTemplate<I, O> {
 
 ```ts
 const greeting = template({
-  name: "Greeting",
+  name: 'Greeting',
   input: z.object({ name: z.string() }),
   output: z.string(),
   run: ({ name }) => `Hello ${name}`,
 })
 
 const version = template({
-  name: "Version",
+  name: 'Version',
   output: z.string(),
-  run: () => "1.0.0",
+  run: () => '1.0.0',
 })
 ```
 
@@ -39,7 +39,7 @@ Omit `input` for a template with no input. The callback may return a value or a 
 ## `invoke()`
 
 ```ts
-const result = await invoke(greeting, { name: "Ada" })
+const result = await invoke(greeting, { name: 'Ada' })
 const currentVersion = await invoke(version)
 ```
 

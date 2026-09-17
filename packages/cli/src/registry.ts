@@ -1,15 +1,15 @@
-import { access } from "node:fs/promises"
-import { constants } from "node:fs"
-import { resolve } from "node:path"
-import { RegistryNotFoundError } from "@tempalace/core"
+import { access } from 'node:fs/promises'
+import { constants } from 'node:fs'
+import { resolve } from 'node:path'
+import { RegistryNotFoundError } from '@tempalace/core'
 
 const REGISTRY_FILENAMES = [
-  "templates.ts",
-  "templates.mts",
-  "templates.cts",
-  "templates.js",
-  "templates.mjs",
-  "templates.cjs",
+  'templates.ts',
+  'templates.mts',
+  'templates.cts',
+  'templates.js',
+  'templates.mjs',
+  'templates.cjs',
 ] satisfies readonly string[]
 
 export async function findRegistryPath(cwd: string, registryPath?: string): Promise<string> {
@@ -33,9 +33,7 @@ export async function findRegistryPath(cwd: string, registryPath?: string): Prom
     }
   }
 
-  throw new RegistryNotFoundError(
-    `No registry found in '${cwd}'. Expected one of: ${REGISTRY_FILENAMES.join(", ")}.`,
-  )
+  throw new RegistryNotFoundError(`No registry found in '${cwd}'. Expected one of: ${REGISTRY_FILENAMES.join(', ')}.`)
 }
 
 export { REGISTRY_FILENAMES }

@@ -1,8 +1,9 @@
-export * from "./errors.js"
-export * from "./executor.js"
-export * from "./grammar.js"
-export * from "./invoke.js"
-export * from "./jiti-registry-loader.js"
-export * from "./registry.js"
-export * from "./template.js"
-export * from "./testing.js"
+export * from './errors.js'
+export * from './executor.js'
+export * from './grammar.js'
+export * from './invoke.js'
+export * from './jiti-registry-loader.js'
+export * from './registry.js'
+export * from './template.js'
+export * from './testing.js'
+export * as zod from 'zod'

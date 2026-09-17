@@ -17,7 +17,7 @@ export class InputValidationError extends TempalaceError {
   public constructor(
     message: string,
     public readonly issues: readonly string[],
-    options?: ErrorOptions,
+    options?: ErrorOptions
   ) {
     super(message, options)
   }
@@ -29,7 +29,7 @@ export class OutputValidationError extends TempalaceError {
   public constructor(
     message: string,
     public readonly issues: readonly string[],
-    options?: ErrorOptions,
+    options?: ErrorOptions
   ) {
     super(message, options)
   }

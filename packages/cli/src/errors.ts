@@ -1,4 +1,4 @@
-import { InputValidationError, TempalaceError } from "@tempalace/core"
+import { InputValidationError, TempalaceError } from '@tempalace/core'
 
 export function formatError(error: unknown, debug: boolean): string {
   if (debug && error instanceof Error && error.stack !== undefined) {
@@ -6,7 +6,7 @@ export function formatError(error: unknown, debug: boolean): string {
   }
 
   if (error instanceof InputValidationError && error.issues.length > 0) {
-    return `${error.message}\n${error.issues.map((issue) => `  ${issue}`).join("\n")}`
+    return `${error.message}\n${error.issues.map(issue => `  ${issue}`).join('\n')}`
   }
   if (error instanceof TempalaceError) {
     return error.message
@@ -14,5 +14,5 @@ export function formatError(error: unknown, debug: boolean): string {
   if (error instanceof Error) {
     return error.message
   }
-  return "An unexpected error occurred."
+  return 'An unexpected error occurred.'
 }

@@ -1,6 +1,6 @@
-import { isDeepStrictEqual } from "node:util"
-import { invoke } from "./invoke.js"
-import type { Template } from "./template.js"
+import { isDeepStrictEqual } from 'node:util'
+import { invoke } from './invoke.js'
+import type { Template } from './template.js'
 
 export interface TemplateCaseFailure {
   readonly index: number

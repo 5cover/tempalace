@@ -218,7 +218,7 @@ Core never depends on the CLI.
 The public abstraction should remain small:
 
 ```ts
-import type { ZodType } from "zod"
+import type { ZodType } from 'zod'
 
 export interface Template<I, O> {
   name: string
@@ -236,12 +236,12 @@ Prefer exposing templates through a constructor rather than encouraging users to
 Example:
 
 ```ts
-import { template } from "@tempalace/core"
-import { z } from "zod"
+import { template } from '@tempalace/core'
+import { z } from 'zod'
 
 export const greet = template({
-  name: "Greet",
-  description: "Generate a greeting",
+  name: 'Greet',
+  description: 'Generate a greeting',
 
   input: z.object({
     name: z.string(),
@@ -358,8 +358,8 @@ An explicit registry path bypasses default registry discovery.
 The default export is a keyed object:
 
 ```ts
-import { greet } from "./templates/greet"
-import { fixtures } from "./templates/fixtures"
+import { greet } from './templates/greet'
+import { fixtures } from './templates/fixtures'
 
 export default {
   greet,
@@ -433,11 +433,7 @@ Even though execution is initially in-process, wrap invocation behind an interna
 
 ```ts
 interface TemplateExecutor {
-  execute(
-    template: Template<unknown, unknown>,
-    input: unknown,
-    options?: ExecutionOptions,
-  ): Promise<unknown>
+  execute(template: Template<unknown, unknown>, input: unknown, options?: ExecutionOptions): Promise<unknown>
 }
 ```
 
@@ -521,7 +517,7 @@ A CLI value supplied using:
 is always passed initially as the string:
 
 ```ts
-"Alice"
+'Alice'
 ```
 
 There is no implicit conversion.
@@ -765,8 +761,8 @@ Recommended API:
 
 ```ts
 const greet = template({
-  name: "Greet",
-  description: "Generate a greeting",
+  name: 'Greet',
+  description: 'Generate a greeting',
   input: z.object({
     name: z.string(),
   }),
@@ -776,19 +772,14 @@ const greet = template({
     return `Hello ${name}`
   },
 
-  tests: [
-    [
-      { name: "Ada" },
-      "Hello Ada",
-    ],
-  ],
+  tests: [[{ name: 'Ada' }, 'Hello Ada']],
 })
 ```
 
 The basic tuple means:
 
 ```ts
-[input, expectedOutput]
+;[input, expectedOutput]
 ```
 
 For v1, equality may use deep strict equality.
@@ -861,10 +852,10 @@ The core API should eventually allow programs to construct templates using offic
 Example future API:
 
 ```ts
-import { mustache } from "@tempalace/grammar-mustache"
+import { mustache } from '@tempalace/grammar-mustache'
 
 const email = mustache({
-  file: "./email.mustache",
+  file: './email.mustache',
   input: z.object({
     name: z.string(),
   }),
@@ -1002,7 +993,7 @@ Implement:
 Exit criterion:
 
 ```ts
-const result = await invoke(greet, { name: "Ada" })
+const result = await invoke(greet, { name: 'Ada' })
 ```
 
 works with full TypeScript inference and runtime validation.
@@ -1160,12 +1151,12 @@ Create `README.md` containing:
 The README should include a complete minimal example:
 
 ```ts
-import { template } from "@tempalace/core"
-import { z } from "zod"
+import { template } from '@tempalace/core'
+import { z } from 'zod'
 
 const greet = template({
-  name: "Greet",
-  description: "Generate a greeting",
+  name: 'Greet',
+  description: 'Generate a greeting',
   input: z.object({
     name: z.string(),
   }),

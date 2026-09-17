@@ -15,12 +15,12 @@ pnpm add -D tempalace @tempalace/core zod
 Create `templates.ts` in the directory where you will run `tp`:
 
 ```ts
-import { template } from "@tempalace/core"
-import { z } from "zod"
+import { template } from '@tempalace/core'
+import { z } from 'zod'
 
 const greet = template({
-  name: "Greet",
-  description: "Generate a greeting",
+  name: 'Greet',
+  description: 'Generate a greeting',
   input: z.object({
     name: z.string(),
   }),
@@ -51,7 +51,7 @@ tp greet +name Ada
 
 ```ts
 const releaseNotes = template({
-  name: "Release notes",
+  name: 'Release notes',
   input: z.object({ version: z.string() }),
   output: z.string(),
   async run({ version }) {
@@ -66,9 +66,9 @@ Templates without input simply omit `input`; their `run` callback receives no ar
 
 ```ts
 const version = template({
-  name: "Version",
+  name: 'Version',
   output: z.string(),
-  run: () => "1.0.0",
+  run: () => '1.0.0',
 })
 ```
 
@@ -129,11 +129,11 @@ Templates can carry small data-driven test cases. They use deep strict equality.
 
 ```ts
 const greet = template({
-  name: "Greet",
+  name: 'Greet',
   input: z.object({ name: z.string() }),
   output: z.string(),
   run: ({ name }) => `Hello ${name}`,
-  tests: [[{ name: "Ada" }, "Hello Ada"]],
+  tests: [[{ name: 'Ada' }, 'Hello Ada']],
 })
 ```
 
