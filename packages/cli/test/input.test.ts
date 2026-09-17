@@ -29,25 +29,16 @@ test('accepts primitive whole JSON, YAML, and plain-text input', async () => {
 })
 
 test('combines + arguments only with structured object input', async () => {
-  assert.deepEqual(
-    await resolveInvocationInput({ inputJson: '{"name":"Ada"}' }, { salutation: 'Hello' }),
-    { name: 'Ada', salutation: 'Hello' },
-  )
-  await assert.rejects(
-    resolveInvocationInput({ inputJson: '42' }, { value: 'Ada' }),
-    InputValidationError,
-  )
-  await assert.rejects(
-    resolveInvocationInput({ input: 'Ada' }, { value: 'Ada' }),
-    InputValidationError,
-  )
+  assert.deepEqual(await resolveInvocationInput({ inputJson: '{"name":"Ada"}' }, { salutation: 'Hello' }), {
+    name: 'Ada',
+    salutation: 'Hello',
+  })
+  await assert.rejects(resolveInvocationInput({ inputJson: '42' }, { value: 'Ada' }), InputValidationError)
+  await assert.rejects(resolveInvocationInput({ input: 'Ada' }, { value: 'Ada' }), InputValidationError)
 })
 
 test('rejects more than one whole-input representation', async () => {
-  await assert.rejects(
-    resolveInvocationInput({ input: 'Ada', inputJson: '"Ada"' }, {}),
-    InputValidationError,
-  )
+  await assert.rejects(resolveInvocationInput({ input: 'Ada', inputJson: '"Ada"' }, {}), InputValidationError)
 })
 
 test('serializes outputs predictably', () => {

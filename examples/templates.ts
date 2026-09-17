@@ -36,7 +36,7 @@ const uppercase = template({
   description: 'Convert a string input to uppercase.',
   input: z.string(),
   output: z.string(),
-  run: (value) => value.toUpperCase(),
+  run: value => value.toUpperCase(),
   tests: [['Ada', 'ADA']],
 })
 

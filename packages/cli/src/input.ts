@@ -30,27 +30,29 @@ export async function readStructuredInput(value: string, format: StructuredForma
 
 export async function resolveInvocationInput(
   options: InvocationInputOptions,
-  fields: Readonly<Record<string, unknown>>,
+  fields: Readonly<Record<string, unknown>>
 ): Promise<unknown> {
-  const sources = [options.input, options.inputJson, options.inputYaml]
-    .filter((source): source is string => source !== undefined)
+  const sources = [options.input, options.inputJson, options.inputYaml].filter(
+    (source): source is string => source !== undefined
+  )
   if (sources.length > 1) {
-    throw new InputValidationError("Use only one of --input, --input-json, or --input-yaml.", [])
+    throw new InputValidationError('Use only one of --input, --input-json, or --input-yaml.', [])
   }
 
   if (options.input !== undefined) {
     if (Object.keys(fields).length > 0) {
-      throw new InputValidationError("--input cannot be combined with + arguments.", [])
+      throw new InputValidationError('--input cannot be combined with + arguments.', [])
     }
     return options.input
   }
 
   const hasStructuredInput = options.inputJson !== undefined || options.inputYaml !== undefined
-  const structuredInput = options.inputJson !== undefined
-    ? await readStructuredInput(options.inputJson, "json")
-    : options.inputYaml !== undefined
-      ? await readStructuredInput(options.inputYaml, "yaml")
-      : undefined
+  const structuredInput =
+    options.inputJson !== undefined
+      ? await readStructuredInput(options.inputJson, 'json')
+      : options.inputYaml !== undefined
+        ? await readStructuredInput(options.inputYaml, 'yaml')
+        : undefined
 
   if (!hasStructuredInput) {
     return fields
@@ -60,8 +62,8 @@ export async function resolveInvocationInput(
   }
   if (!isObjectRecord(structuredInput)) {
     throw new InputValidationError(
-      "+ arguments can only be combined with an object supplied through --input-json or --input-yaml.",
-      [],
+      '+ arguments can only be combined with an object supplied through --input-json or --input-yaml.',
+      []
     )
   }
 
@@ -74,7 +76,7 @@ export async function resolveInvocationInput(
 }
 
 function isObjectRecord(value: unknown): value is Record<string, unknown> {
-  return value !== null && typeof value === "object" && !Array.isArray(value)
+  return value !== null && typeof value === 'object' && !Array.isArray(value)
 }
 
 async function readStandardInput(): Promise<string> {

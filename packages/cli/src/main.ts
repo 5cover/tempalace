@@ -63,10 +63,10 @@ async function executeTemplate(
   }
   if (!isParameterizedTemplate(currentTemplate)) {
     if (
-      Object.keys(fields).length > 0
-      || options.input !== undefined
-      || options.inputJson !== undefined
-      || options.inputYaml !== undefined
+      Object.keys(fields).length > 0 ||
+      options.input !== undefined ||
+      options.inputJson !== undefined ||
+      options.inputYaml !== undefined
     ) {
       throw new InputValidationError(`Template '${id}' does not accept input.`, [])
     }

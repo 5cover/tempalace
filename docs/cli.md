@@ -23,16 +23,16 @@ An input-less template is selected and run without an input prompt. Directly inv
 
 ## Template input
 
-| Form                            | Meaning                             |
-| ------------------------------- | ----------------------------------- |
-| `+name Ada`                     | Pass the string `"Ada"` to `name`.  |
-| `+config:json '{"a":1}'`        | Parse only `config` as JSON.        |
-| `+config:yaml 'a: 1'`           | Parse only `config` as YAML.        |
-| `--input 'Ada'`                 | Pass `"Ada"` directly as a string. |
-| `--input-json '42'`             | Parse any whole input as JSON.      |
-| `--input-yaml 'name: Ada'`      | Parse any whole input as YAML.      |
-| `--input-json -`                | Read any JSON value from stdin.     |
-| `--input-yaml -`                | Read any YAML value from stdin.     |
+| Form                       | Meaning                            |
+| -------------------------- | ---------------------------------- |
+| `+name Ada`                | Pass the string `"Ada"` to `name`. |
+| `+config:json '{"a":1}'`   | Parse only `config` as JSON.       |
+| `+config:yaml 'a: 1'`      | Parse only `config` as YAML.       |
+| `--input 'Ada'`            | Pass `"Ada"` directly as a string. |
+| `--input-json '42'`        | Parse any whole input as JSON.     |
+| `--input-yaml 'name: Ada'` | Parse any whole input as YAML.     |
+| `--input-json -`           | Read any JSON value from stdin.    |
+| `--input-yaml -`           | Read any YAML value from stdin.    |
 
 `--input` and `+` values are strings and are never coerced. A numeric Zod schema therefore requires explicit JSON or YAML unless the template author accepts and transforms a string. Use only one whole-input option. `+` arguments may combine with an object supplied by JSON or YAML, but cannot combine with a primitive whole input.
 
