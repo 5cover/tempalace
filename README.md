@@ -152,6 +152,10 @@ The core package provides `Template`, `template()`, `invoke()`, registries, test
 
 See [the API reference](docs/api.md), [CLI reference](docs/cli.md), and [architecture](docs/architecture.md). Future work and non-goals are in [ROADMAP.md](ROADMAP.md).
 
+## Publishing
+
+Tempalace publishes two npm packages: `@tempalace/core` and `tempalace`. Run `pnpm publish:check` before a release. The full release sequence is documented in [docs/publishing.md](docs/publishing.md).
+
 ## Security model
 
 Registries are trusted project code. Loading a registry executes it, and running a template executes its function in the current Node.js process. Tempalace v1 does not sandbox templates or claim purity. Review registries with the same care as build scripts and test configuration.

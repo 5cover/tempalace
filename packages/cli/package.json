@@ -40,7 +40,9 @@
     "pretypecheck": "pnpm --filter @tempalace/core build",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "pretest": "pnpm --filter @tempalace/core build",
-    "test": "tsc -p tsconfig.test.json && node --test .test-build/test/*.test.js"
+    "test": "tsc -p tsconfig.test.json && node --test .test-build/test/*.test.js",
+    "prepack": "pnpm --filter @tempalace/core build && pnpm run build",
+    "prepublishOnly": "pnpm run typecheck && pnpm run test && pnpm run build"
   },
   "dependencies": {
     "@commander-js/extra-typings": "^14.0.0",
