@@ -44,6 +44,7 @@ test('reports input validation failures', async () => {
     run: value => value,
   })
 
+  // @ts-expect-error runtime validation must also reject input the types forbid
   await assert.rejects(invoke(currentTemplate, 42), InputValidationError)
 })
 
@@ -81,4 +82,32 @@ test('respects transforms in template input and output schemas', async () => {
   })
 
   assert.deepEqual(await invoke(tp, 'abc', { validateOutput: true }), { x: 4 })
+})
+
+test('types invocation input as z.input and result as z.output', async () => {
+  const tp = template({
+    name: 'Transformer',
+    input: z.string().transform(s => s.length),
+    output: z.number().transform(x => ({ x })),
+    run: x => x + 1,
+  })
+
+  const result: { x: number } = await invoke(tp, 'abc')
+  assert.deepEqual(result, { x: 4 })
+
+  // @ts-expect-error the raw input is a string, the number is produced by the transform
+  await assert.rejects(invoke(tp, 4), InputValidationError)
+  // @ts-expect-error the result is the parsed output object, not the number returned by run
+  const numeric: number = await invoke(tp, 'abc')
+  assert.deepEqual(numeric, { x: 4 })
+})
+
+test('types run as receiving z.output of input and returning z.input of output', () => {
+  template({
+    name: 'Typed run',
+    input: z.string().transform(s => s.length),
+    output: z.number().transform(x => ({ x })),
+    // @ts-expect-error run receives the parsed length and returns the number that the output transform consumes
+    run: n => ({ x: n }),
+  })
 })

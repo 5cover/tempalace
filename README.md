@@ -60,7 +60,7 @@ const releaseNotes = template({
 })
 ```
 
-Composition remains normal code. If one template needs another, import it and call `await other.run(input)` in its implementation. Tempalace deliberately has no CLI composition syntax.
+Composition remains normal code. If one template needs another, import it and call `await invoke(other, input)` in its implementation. Calling `other.run` directly skips input and output validation. Tempalace deliberately has no CLI composition syntax.
 
 Templates without input simply omit `input`; their `run` callback receives no argument. The CLI invokes them immediately after selection and does not show an input prompt.
 

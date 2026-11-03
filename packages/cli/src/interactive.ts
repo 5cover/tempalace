@@ -83,7 +83,7 @@ async function collectStructuredField(fieldName: string): Promise<unknown> {
   return readStructuredInput(source, format)
 }
 
-async function collectObjectInput(currentTemplate: Template<unknown, unknown>): Promise<unknown> {
+async function collectObjectInput(currentTemplate: Template): Promise<unknown> {
   if (!isParameterizedTemplate(currentTemplate)) {
     return undefined
   }

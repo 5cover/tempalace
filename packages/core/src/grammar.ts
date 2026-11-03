@@ -7,5 +7,5 @@ export interface GrammarSource {
 
 export interface Grammar {
   readonly name: string
-  load(source: GrammarSource): Promise<Template<unknown, unknown>>
+  load(source: GrammarSource): Promise<Template>
 }

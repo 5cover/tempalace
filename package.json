@@ -14,7 +14,9 @@
     "publish:check": "pnpm typecheck && pnpm test && pnpm build && pnpm pack:check"
   },
   "devDependencies": {
-    "@tempalace/core": "workspace:*"
+    "@tempalace/core": "workspace:*",
+    "prettier": "^3.9.10",
+    "tsx": "^4.23.15"
   },
   "prettier": {
     "printWidth": 120,

@@ -1,5 +1,5 @@
 import { isDeepStrictEqual } from 'node:util'
-import { invoke } from './invoke.js'
+import { invokeTemplate } from './invoke.js'
 import type { Template } from './template.js'
 
 export interface TemplateCaseFailure {
@@ -15,14 +15,14 @@ export interface TemplateTestResult {
   readonly failures: readonly TemplateCaseFailure[]
 }
 
-export async function runTemplateTests<I, O>(template: Template<I, O>): Promise<TemplateTestResult> {
+export async function runTemplateTests(template: Template): Promise<TemplateTestResult> {
   const testCases = template.tests ?? []
   const failures: TemplateCaseFailure[] = []
   let passed = 0
 
   for (const [index, [input, expectedOutput]] of testCases.entries()) {
     try {
-      const actualOutput = await invoke(template, input)
+      const actualOutput = await invokeTemplate(template, input)
       if (!isDeepStrictEqual(actualOutput, expectedOutput)) {
         failures.push({ index, input, expectedOutput, actualOutput })
         continue

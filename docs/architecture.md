@@ -2,7 +2,7 @@
 
 ## Template abstraction
 
-A `Template<I, O>` holds a human-facing `name`, optional `description`, Zod `input` and `output` schemas, and `run(input)`. The `template()` constructor connects schema inference to `run` so TypeScript detects mismatches. `invoke()` always validates input, awaits synchronous or asynchronous functions uniformly, and validates output unless explicitly disabled.
+A `Template` holds a human-facing `name`, optional `description`, Zod `input` and `output` schemas, and `run(input)`. The `template()` constructor connects schema inference to `run` so TypeScript detects mismatches. `invoke()` always validates input, awaits synchronous or asynchronous functions uniformly, and validates output unless explicitly disabled.
 
 Templates may also omit `input`. Their callback is `run()` and `invoke(template)` executes them without input parsing. The CLI recognizes this variant and skips input collection completely.
 

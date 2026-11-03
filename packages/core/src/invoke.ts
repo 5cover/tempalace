@@ -1,4 +1,5 @@
 import { InputValidationError, OutputValidationError, TemplateExecutionError } from './errors.js'
+import type { zod as z } from './index.js'
 import {
   isParameterizedTemplate,
   type InputlessTemplate,
@@ -22,28 +23,31 @@ function formatIssues(
   })
 }
 
-export function invoke<O>(currentTemplate: InputlessTemplate<O>, options?: InvocationOptions): Promise<O>
-export function invoke<I, O>(
-  currentTemplate: ParameterizedTemplate<I, O>,
-  rawInput: unknown,
+export function invoke<OutputSchema extends z.ZodType>(
+  currentTemplate: InputlessTemplate<OutputSchema>,
   options?: InvocationOptions
-): Promise<O>
-export function invoke<I, O>(
-  currentTemplate: Template<I, O>,
+): Promise<z.output<OutputSchema>>
+export function invoke<InputSchema extends z.ZodType, OutputSchema extends z.ZodType>(
+  currentTemplate: ParameterizedTemplate<InputSchema, OutputSchema>,
+  rawInput: z.input<InputSchema>,
+  options?: InvocationOptions
+): Promise<z.output<OutputSchema>>
+export function invoke(currentTemplate: Template, rawInput?: unknown, options?: InvocationOptions): Promise<unknown> {
+  return invokeTemplate(currentTemplate, rawInput, options)
+}
+
+// Untyped entry point for callers that hold a Template of unknown schema types, such as registries and executors.
+export async function invokeTemplate(
+  currentTemplate: Template,
   rawInput?: unknown,
   options?: InvocationOptions
-): Promise<O>
-export async function invoke<I, O>(
-  currentTemplate: Template<I, O>,
-  rawInput?: unknown,
-  options?: InvocationOptions
-): Promise<O> {
+): Promise<unknown> {
   const invocationOptions =
     !isParameterizedTemplate(currentTemplate) && options === undefined && isInvocationOptions(rawInput)
       ? rawInput
       : (options ?? {})
 
-  let result: O
+  let result: unknown
   try {
     if (isParameterizedTemplate(currentTemplate)) {
       const parsedInput = currentTemplate.input.safeParse(rawInput)

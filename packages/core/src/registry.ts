@@ -1,13 +1,13 @@
 import { InvalidRegistryError } from './errors.js'
 import type { Template } from './template.js'
 
-export type TemplateRegistry = Readonly<Record<string, Template<unknown, unknown>>>
+export type TemplateRegistry = Readonly<Record<string, Template>>
 
 export interface RegistryLoader {
   load(path: string): Promise<TemplateRegistry>
 }
 
-function isTemplate(value: unknown): value is Template<unknown, unknown> {
+function isTemplate(value: unknown): value is Template {
   if (!isRecord(value)) {
     return false
   }
@@ -33,7 +33,7 @@ export function validateRegistry(value: unknown): TemplateRegistry {
     throw new InvalidRegistryError('Registry default export must be an object keyed by template ID.')
   }
 
-  const registry: Record<string, Template<unknown, unknown>> = {}
+  const registry: Record<string, Template> = {}
   for (const [id, currentTemplate] of Object.entries(value)) {
     if (id.length === 0) {
       throw new InvalidRegistryError('Registry template IDs cannot be empty.')
