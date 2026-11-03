@@ -71,3 +71,14 @@ test('validates output unless explicitly disabled', async () => {
   await assert.rejects(invoke(currentTemplate, 'x'), OutputValidationError)
   assert.equal(await invoke(currentTemplate, 'x', { validateOutput: false }), 'invalid')
 })
+
+test('respects transforms in template input and output schemas', async () => {
+  const tp = template({
+    name: 'Transfomer',
+    input: z.string().transform(s => s.length),
+    output: z.number().transform(x => ({ x })),
+    run: x => x + 1,
+  })
+
+  assert.deepEqual(await invoke(tp, 'abc', { validateOutput: true }), { x: 4 })
+})

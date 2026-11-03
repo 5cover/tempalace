@@ -1,4 +1,4 @@
-import { zod as z } from '@tempalace/core'
+import { zod as z } from './index.js'
 
 interface TemplateMetadata<OutputSchema extends z.ZodType> {
   readonly name: string
@@ -9,8 +9,8 @@ interface TemplateMetadata<OutputSchema extends z.ZodType> {
 export type TemplateTestCase<I, O> = readonly [input: I, expectedOutput: O]
 
 export interface TemplateDefinition<OutputSchema extends z.ZodType> extends TemplateMetadata<OutputSchema> {
-  readonly run: () => z.output<OutputSchema> | Promise<z.output<OutputSchema>>
-  readonly tests?: readonly TemplateTestCase<undefined, z.output<OutputSchema>>[]
+  readonly run: () => z.input<OutputSchema> | Promise<z.input<OutputSchema>>
+  readonly tests?: readonly TemplateTestCase<undefined, z.input<OutputSchema>>[]
 }
 
 export type ParameterizedTemplateDefinition<InputSchema extends z.ZodType, OutputSchema extends z.ZodType> = Omit<
@@ -18,8 +18,8 @@ export type ParameterizedTemplateDefinition<InputSchema extends z.ZodType, Outpu
   'run' | 'tests'
 > & {
   readonly input: InputSchema
-  readonly run: (input: z.input<InputSchema>) => z.output<OutputSchema> | Promise<z.output<OutputSchema>>
-  readonly tests?: readonly TemplateTestCase<z.input<InputSchema>, z.output<OutputSchema>>[]
+  readonly run: (input: z.output<InputSchema>) => z.input<OutputSchema> | Promise<z.input<OutputSchema>>
+  readonly tests?: readonly TemplateTestCase<z.output<InputSchema>, z.input<OutputSchema>>[]
 }
 
 export interface InputlessTemplate<O> {
@@ -49,10 +49,10 @@ export function isParameterizedTemplate<I, O>(
 
 export function template<InputSchema extends z.ZodType, OutputSchema extends z.ZodType>(
   definition: ParameterizedTemplateDefinition<InputSchema, OutputSchema>
-): ParameterizedTemplate<z.input<InputSchema>, z.output<OutputSchema>>
+): ParameterizedTemplate<z.output<InputSchema>, z.input<OutputSchema>>
 export function template<OutputSchema extends z.ZodType>(
   definition: TemplateDefinition<OutputSchema>
-): InputlessTemplate<z.output<OutputSchema>>
+): InputlessTemplate<z.input<OutputSchema>>
 export function template(
   definition: TemplateDefinition<z.ZodType> | ParameterizedTemplateDefinition<z.ZodType, z.ZodType>
 ): Template<unknown, unknown> {
