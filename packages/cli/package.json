@@ -40,11 +40,10 @@
     "access": "public"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "build": "tsc -p tsconfig.build.json",
     "pretypecheck": "pnpm --filter @tempalace/core build",
-    "typecheck": "tsc --noEmit -p tsconfig.json",
-    "pretest": "pnpm --filter @tempalace/core build",
-    "test": "tsc -p tsconfig.test.json && node --test .test-build/test/*.test.js",
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test test/*.test.ts",
     "prepack": "pnpm --filter @tempalace/core build && pnpm run build",
     "prepublishOnly": "pnpm run typecheck && pnpm run test && pnpm run build"
   },
