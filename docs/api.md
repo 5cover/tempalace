@@ -10,14 +10,19 @@ interface ParameterizedTemplate<InputSchema extends ZodType, OutputSchema extend
   readonly description?: string
   readonly input: InputSchema
   readonly output: OutputSchema
-  readonly run: (input: z.output<InputSchema>) => z.input<OutputSchema> | Promise<z.input<OutputSchema>>
+  run(
+    this: ParameterizedTemplate<InputSchema, OutputSchema>,
+    input: z.output<InputSchema>
+  ): z.input<OutputSchema> | Promise<z.input<OutputSchema>>
   readonly tests?: readonly TemplateTestCase<z.input<InputSchema>, z.output<OutputSchema>>[]
 }
 ```
 
+`run` is declared as a method, so `this` is the template being run. Define it with method syntax (`run(input) { ... }`) to use `this`, for example `this.input` or recursive `this.run(...)`. Arrow functions cannot read `this`, but they are still accepted for `run`. Call `run` as a method (`greet.run(x)`) or through `invoke`. A detached reference such as `const { run } = greet` is a compile error.
+
 `run` receives the parsed input (`z.output` of the input schema). It returns the value before output parsing (`z.input` of the output schema), which the output schema then parses.
 
-`InputlessTemplate<OutputSchema>` has no `input` property and has `run(): z.input<OutputSchema> | Promise<z.input<OutputSchema>>`. Use `template()` rather than manually creating either variant. It preserves schema inference for `run`.
+`InputlessTemplate<OutputSchema>` has no `input` property and has `run(this: InputlessTemplate<OutputSchema>): z.input<OutputSchema> | Promise<z.input<OutputSchema>>`. Use `template()` rather than manually creating either variant. It returns its argument unchanged and exists for schema inference.
 
 ## `template()`
 

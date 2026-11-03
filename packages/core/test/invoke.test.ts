@@ -102,6 +102,49 @@ test('types invocation input as z.input and result as z.output', async () => {
   assert.deepEqual(numeric, { x: 4 })
 })
 
+test('passes the template as this to run, including recursive calls', async () => {
+  const countdown = template({
+    name: 'Countdown',
+    input: z.number(),
+    output: z.number(),
+    run(n) {
+      return n <= 0 ? 0 : this.run(n - 1)
+    },
+  })
+
+  assert.equal(await invoke(countdown, 3), 0)
+  assert.equal(await countdown.run(3), 0)
+})
+
+test('types this.input as the template input schema', async () => {
+  const selfTyped = template({
+    name: 'Self typed',
+    input: z.string(),
+    output: z.number(),
+    run(value) {
+      const schema: z.ZodString = this.input
+      return schema.safeParse(value).success ? value.length : 0
+    },
+  })
+
+  assert.equal(await invoke(selfTyped, 'Ada'), 3)
+})
+
+test('rejects a detached run reference because it has no template to bind as this', () => {
+  const countdown = template({
+    name: 'Countdown',
+    input: z.number(),
+    output: z.number(),
+    run(n) {
+      return n <= 0 ? 0 : this.run(n - 1)
+    },
+  })
+  const detached = countdown.run
+
+  // @ts-expect-error run requires its template as this, so a detached call does not type-check
+  assert.throws(() => detached(3))
+})
+
 test('types run as receiving z.output of input and returning z.input of output', () => {
   template({
     name: 'Typed run',
